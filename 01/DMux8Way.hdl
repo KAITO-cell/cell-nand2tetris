@@ -1,0 +1,60 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux8Way.hdl
+
+/**
+ * 8-way demultiplexor:
+ * {a, b, c, d, e, f, g, h} = {in, 0, 0, 0, 0, 0, 0, 0} if sel == 000
+ *                            {0, in, 0, 0, 0, 0, 0, 0} if sel == 001
+ *                            etc.
+ *                            {0, 0, 0, 0, 0, 0, 0, in} if sel == 111
+ */
+
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    // Put your code here:
+    
+    /*  nsel2 =not sel[2]
+        nsel1 =not sel[1]
+        nsel0 =not sel[0]
+        in_nsel2 = in and nsel2 10--
+        in_sel2 = in and sel[2] 11--
+        ns1_ns0 = nsel1 and nsel0 --00
+        ns1_s0 = nsel1 and sel[0] --01
+        s1_ns0 = sel[1] and nsel0 --10
+        s1_s0 = sel[1] and sel[0] --11
+    */
+    Not(in=sel[2],out=nsel2);
+    Not(in=sel[1],out=nsel1);
+    Not(in=sel[0],out=nsel0);
+    
+    And(a=in,b=nsel2,out=inAnsel2); 
+    And(a=in,b=sel[2],out=inAsel2);
+
+    And(a=nsel1,b=nsel0,out=ns1Ans0);
+    And(a=nsel1,b=sel[0],out=ns1As0);
+    And(a=sel[1],b=nsel0,out=s1Ans0);
+    And(a=sel[1],b=sel[0],out=s1As0);
+
+    // a = 1000 inAnsel2 and ns1Ans0
+    And(a=inAnsel2,b=ns1Ans0,out=a);
+    // b = 1001 inAnsel2 and ns1As0
+    And(a=inAnsel2,b=ns1As0,out=b);
+    // c = 1010 in_nsel2 and s1Ans0
+    And(a=inAnsel2,b=s1Ans0,out=c);
+    // d = 1011 in_nsel2 and s1_s0
+    And(a=inAnsel2,b=s1As0,out=d);
+    // e = 1100 in_sel2 and ns1_ns0
+    And(a=inAsel2,b=ns1Ans0,out=e);
+    // f = 1101 in_sel2 and ns1_s0
+    And(a=inAsel2,b=ns1As0,out=f);
+    // g = 1110 in_sel2 and s1_ns0
+    And(a=inAsel2,b=s1Ans0,out=g);
+    // h = 1111 in_sel2 and s1_s0
+    And(a=inAsel2,b=s1As0,out=h);
+
+}
